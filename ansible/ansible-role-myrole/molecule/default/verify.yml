@@ -1,0 +1,17 @@
+---
+- name: Verify
+  hosts: molecule
+  gather_facts: true
+  vars_files:
+    - ../../vars/main.yml
+  
+  # Add tests here
+  tasks:
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Fail if {{ gpg_keys_package }} package is not installed
+      ansible.builtin.fail:
+        msg: "{{ gpg_keys_package }} package is not installed"
+      when: gpg_keys_package not in ansible_facts.packages

@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for myrole
+
+# Below is an example task
+- name: Install {{ gpg_keys_package }} package
+  ansible.builtin.dnf:
+    name: "{{ gpg_keys_package }}"
+    state: present
