@@ -1,0 +1,16 @@
+- name: Verify
+  hosts: molecule
+  gather_facts: true
+  vars_files:
+    - ../../vars/main.yml
+
+  tasks:
+    - name: Get all Unix groups
+      ansible.builtin.getent:
+        database: group
+        split: ':'
+
+    - name: Fail if 'nordvpn' group is not created
+      ansible.builtin.fail:
+        msg: "'nordvpn' group does not exist"
+      when: "'nordvpn' not in ansible_facts.getent_group"
