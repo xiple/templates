@@ -1,0 +1,28 @@
+- name: Verify packages
+  hosts: molecule
+  gather_facts: true
+  vars_files: ../../defaults/main.yml
+  tasks:
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Fail if git is not installed
+      ansible.builtin.fail:
+        msg: "git package is not installed"
+      when: "'git' not in ansible_facts.packages"
+
+    - name: Fail if distribution GPG keys package is not installed
+      ansible.builtin.fail:
+        msg: "{{ gpg_keys_package }} package is not installed"
+      when: gpg_keys_package not in ansible_facts.packages
+
+    - name: Install a package from the free repository
+      ansible.builtin.package:
+        name: rpmfusion-free-release-tainted
+        state: present
+
+    - name: Install a package from the nonfree repository
+      ansible.builtin.package:
+        name: rpmfusion-nonfree-release-tainted
+        state: present
