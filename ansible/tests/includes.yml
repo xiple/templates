@@ -1,0 +1,17 @@
+---
+- name: Verify
+  hosts: molecule
+  gather_facts: true
+  vars_files:
+    - ../../vars/main.yml
+  
+  tasks:
+  - include_tasks: tasks/verify-debian-13.yml
+    when:
+      - ansible_facts.distribution == 'Debian'
+      - ansible_facts.distribution_major_version | int == 13
+
+  - include_tasks: tasks/verify-fedora-42.yml
+    when:
+      - ansible_facts.distribution == 'Fedora'
+      - ansible_facts.distribution_major_version | int == 42
