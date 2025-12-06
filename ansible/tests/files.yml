@@ -1,0 +1,30 @@
+---
+- name: Verify
+  hosts: molecule
+  gather_facts: true
+  vars_files: ../../defaults/main.yml
+  tasks:
+    - name: Get information on 'dotfiles' checked out directory
+      ansible.builtin.stat:
+        path: "{{ dotfiles_repo_local_destination }}"
+      register: dotfiles_dir
+
+    - name: Fail if dotfiles directory does not exist
+      ansible.builtin.fail:
+        msg: "{{ dotfiles_repo_local_destination }} directory does not exist"
+      when: not dotfiles_dir.stat.exists
+
+    - name: Get information on '.bashrc'
+      ansible.builtin.stat:
+        path: "{{ dotfiles_repo_local_destination }}/../.bashrc"
+      register: bashrc_from_dotfiles
+
+    - name: Fail if .bashrc is not a symbolic link to dotfiles/.bashrc
+      ansible.builtin.fail:
+        msg: "{{ dotfiles_repo_local_destination }}/../.bashrc is not a symbolic link to dotfiles/.bashrc"
+      when: >
+          bashrc_from_dotfiles.stat.islnk is not defined
+          or
+          not bashrc_from_dotfiles.stat.islnk
+          or
+          bashrc_from_dotfiles.stat.lnk_target != "dotfiles/.bashrc"
