@@ -22,5 +22,4 @@ scenario:
     - converge
     - idempotence
     - verify
-    - cleanup
     - destroy

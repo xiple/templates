@@ -2,16 +2,24 @@
 - name: Verify
   hosts: molecule
   gather_facts: true
-  vars_files:
-    - ../../vars/main.yml
-  
-  # Add tests here
-  tasks:
-    - name: Gather the package facts
-      ansible.builtin.package_facts:
-        manager: auto
+  vars:
+    tailscale_service_manage: false
 
-    - name: Fail if {{ gpg_keys_package }} package is not installed
-      ansible.builtin.fail:
-        msg: "{{ gpg_keys_package }} package is not installed"
-      when: gpg_keys_package not in ansible_facts.packages
+  tasks:
+    - name: Include Debian 13 verify file
+      ansible.builtin.include_tasks: tasks/verify-debian-13.yml
+      when:
+        - ansible_facts.distribution == 'Debian'
+        - ansible_facts.distribution_major_version | int == 13
+
+    - name: Include Fedora 42 verify file
+      ansible.builtin.include_tasks: tasks/verify-fedora-42.yml
+      when:
+        - ansible_facts.distribution == 'Fedora'
+        - ansible_facts.distribution_major_version | int == 42
+
+    - name: Include Fedora 43 verify file
+      ansible.builtin.include_tasks: tasks/verify-fedora-43.yml
+      when:
+        - ansible_facts.distribution == 'Fedora'
+        - ansible_facts.distribution_major_version | int == 43

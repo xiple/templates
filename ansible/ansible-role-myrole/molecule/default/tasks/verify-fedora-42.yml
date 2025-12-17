@@ -1,0 +1,26 @@
+---
+- name: Get information on tailscale repo file
+  ansible.builtin.stat:
+    path: /etc/yum.repos.d/tailscale.repo
+  register: tailscale_repo_file
+
+- name: Fail if tailscale repo file does not exist
+  ansible.builtin.fail:
+    msg: "/etc/yum.repos.d/tailscale.repo file does not exist"
+  when: not tailscale_repo_file.stat.exists
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Fail if tailscale package is not installed
+  ansible.builtin.fail:
+    msg: "tailscale package is not installed"
+  when: "'tailscale' not in ansible_facts.packages"
+
+- name: Fail if tailscaled service is not enabled
+  ansible.builtin.systemd_service:
+    name: tailscaled
+  register: service_status
+  failed_when: service_status.status.UnitFileState == "disabled"
+  when: tailscale_service_manage | bool

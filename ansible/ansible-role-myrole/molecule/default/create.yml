@@ -3,12 +3,6 @@
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Build custom image
-      containers.podman.podman_image:
-        name: "{{ hostvars[item]['container_image_tag'] }}"
-        path: "{{ hostvars[item]['container_image_path'] }}"
-      loop: "{{ groups['molecule'] }}"
-
     - name: Create containers from inventory
       containers.podman.podman_container:
         hostname: "{{ item }}"
