@@ -19,6 +19,18 @@
       when: gpg_keys_package not in ansible_facts.packages
 
     # for multiples packages in a variable
+    #
+    - name: Fail if tlp packages are missing
+      ansible.builtin.fail:
+        msg: >-
+          Missing tlp packages:
+          {{ tlp_packages
+             | difference(ansible_facts.packages.keys())
+             | join(', ')
+          }}
+      when: tlp_packages | difference(ansible_facts.packages.keys()) | length > 0
+
+    # for multiples packages in a variable
     - name: Fail if conflicting packages are installed
       ansible.builtin.fail:
         msg: "Conflicting packages are installed: {{ tlp_conflicting_package | intersect(ansible_facts.packages.keys()) | join(', ') }}"
