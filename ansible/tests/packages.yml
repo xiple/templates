@@ -12,10 +12,17 @@
         msg: "git package is not installed"
       when: "'git' not in ansible_facts.packages"
 
+    # for one package in a variable
     - name: Fail if distribution GPG keys package is not installed
       ansible.builtin.fail:
         msg: "{{ gpg_keys_package }} package is not installed"
       when: gpg_keys_package not in ansible_facts.packages
+
+    # for multiples packages in a variable
+    - name: Fail if conflicting packages are installed
+      ansible.builtin.fail:
+        msg: "Conflicting packages are installed: {{ tlp_conflicting_package | intersect(ansible_facts.packages.keys()) | join(', ') }}"
+      when: tlp_conflicting_package | intersect(ansible_facts.packages.keys()) | length > 0
 
     - name: Install a package from the free repository
       ansible.builtin.package:
